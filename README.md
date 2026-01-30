@@ -1,78 +1,107 @@
-# RAGProductionApp
+# Event-Driven RAG Agent
 
-Simple Retrieval-Augmented Generation (RAG) demo using PDF ingestion, embeddings, a vector DB (Qdrant), and an LLM via OpenAI. Includes a Streamlit UI to upload PDFs and ask questions, an Inngest workflow for ingestion and query orchestration, and a FastAPI app that exposes Inngest functions.
+A robust, event-driven Retrieval-Augmented Generation (RAG) agent built to ingest PDFs, generate embeddings asynchronously, and answer user queries with context.
 
-## Features
-- PDF load + chunking (llama_index PDFReader + SentenceSplitter)
-- Embedding via OpenAI embeddings
-- Vector storage/search with Qdrant
-- Orchestrated ingestion and query flows using Inngest
-- Streamlit UI for upload + Q&A
-- FastAPI app to serve Inngest functions
+This project leverages **Inngest** for durable workflow orchestration, **Qdrant** for vector storage, **LlamaIndex** for document processing, and **Streamlit** for the user interface.
 
-## Repo layout
-- data_loader.py — PDF loading, chunking, embeddings
-- vector_db.py — Qdrant client wrapper
-- main.py — Inngest functions (ingest + query) and FastAPI app
-- streamlit_app.py — Streamlit frontend for upload and queries
-- custom_types.py — Pydantic models used by workflows
+## 🚀 Features
 
-## Requirements
-- Python 3.10+
-- Qdrant (local or remote)
-- OpenAI API key
-- Inngest local dev server (for dev workflow / observability)
-- Recommended pip packages (example):
-    - fastapi
-    - uvicorn[standard]
-    - streamlit
-    - python-dotenv
-    - openai (or openai-compatible client used in code)
-    - qdrant-client
-    - llama-index
-    - inngest
-    - pydantic
+* **Async PDF Ingestion**: Uploads are processed in the background using Inngest events (`rag/ingest_pdf`), ensuring the UI remains responsive.
+* **Durable Workflows**: Uses Inngest steps to handle failures, retries, and state management during ingestion and retrieval.
+* **Vector Search**: Efficient similarity search using **Qdrant**.
+* **Advanced RAG**: Uses **LlamaIndex** for chunking and **OpenAI** (`text-embedding-3-large`) for high-quality embeddings.
+* **Interactive UI**: Clean interface built with **Streamlit** to upload documents and chat with your data.
 
-Create a virtualenv and install:
-pip install fastapi uvicorn streamlit python-dotenv qdrant-client llama-index inngest pydantic
+## 🛠️ Tech Stack
 
-## Environment variables
-Create a `.env` file with at least:
-OPENAI_API_KEY=sk-...
-Optionally:
-INNGEST_API_BASE=http://127.0.0.1:8288/v1
-QDRANT_URL=http://localhost:6333
+* **Workflow Orchestration**: [Inngest](https://www.inngest.com/)
+* **Backend API**: FastAPI
+* **Frontend**: Streamlit
+* **Vector Database**: Qdrant
+* **Package Manager**: uv
+* **LLM & Embeddings**: OpenAI (GPT-4o-mini & text-embedding-3-large)
 
-## Run (local development)
-1. Start Qdrant
-     - Quick (Docker): docker run -p 6333:6333 qdrant/qdrant
-     - Or use your hosted Qdrant and set QDRANT_URL
+## 📂 Project Structure
 
-2. Start Inngest local dev server (used by the Streamlit UI to send events)
-     - Run your local Inngest dev server per Inngest docs (e.g., `inngest dev` or equivalent).
+```bash
+├── main.py             # FastAPI app & Inngest function definitions
+├── streamlit_app.py    # Frontend UI for uploading PDFs and chat
+├── data_loader.py      # Logic for loading PDFs and generating embeddings
+├── vector_db.py        # Qdrant client wrapper
+├── custom_types.py     # Pydantic models for data validation
+├── pyproject.toml      # Project dependencies (uv)
+└── .env                # Environment variables (API Keys)
+```
+## ⚙️ Prerequisites
 
-3. Run the FastAPI app (Inngest functions)
-     uvicorn main:app --reload --port 8000
+Before running the project, ensure you have the following installed:
 
-4. Run the Streamlit UI
-     streamlit run streamlit_app.py
+- **Python 3.13+**
+- [**uv**](https://github.com/astral-sh/uv) (Python package manager)
+- **Docker Desktop** (for running Qdrant)
+- **Node.js & npm** (for running the Inngest CLI)
 
-5. Use the UI
-     - Upload a PDF to trigger ingestion (chunks → embeddings → upsert to Qdrant)
-     - Ask a question in the form to query, retrieve contexts, and get an LLM answer
+## 📦 Installation & Setup
 
-## Notes & tips
-- Chunk sizing is controlled in data_loader.py (SentenceSplitter).
-- Embedding model and dims are defined in data_loader.py (adjust to fit your account/features).
-- Qdrant collection is created automatically by QdrantStorage if missing.
-- In production, secure API keys and configure Inngest and Qdrant appropriately.
+1. **Clone the repository:**
+    ```bash
+    git clone https://github.com/amanparganiha/Event-Driven-RAG-Agent.git && cd Event-Driven-RAG-Agent
+    ```
+    
+2. **Install dependencies using uv:**
+    ```bash
+    uv sync
+    ```
+    
+3. **Set up Environment Variables:**
+Create a `.env` file in the root directory and add your keys:
+    ```bash
+    OPENAI_API_KEY=sk-your-openai-key-here
+    ```
 
-## Troubleshooting
-- If no search results, verify:
-    - Qdrant is reachable at the expected URL
-    - Embeddings completed successfully during ingestion
-    - OPENAI_API_KEY is set and valid
-- Inspect Inngest runs via the local Inngest dashboard / API to see step outputs and errors.
+## 🏃‍♂️ Running the Application
 
-## License
-Project skeleton — adapt and extend for your use.
+This system requires 4 components running simultaneously. Open 4 separate terminal windows.
+
+### Step 1: Start Vector Database (Qdrant)
+
+Make sure **Docker Desktop** is running, then run:
+
+```bash
+docker run -p 6333:6333 qdrant/qdrant
+```
+
+### Step 2: Start the Backend API
+
+In a new terminal, run the FastAPI server (Main App):
+
+```bash
+uv run uvicorn main:app
+```
+
+### Step 3: Start the Inngest Dev Server
+
+In a new terminal, run the Inngest CLI to manage workflows:
+
+```bash
+npx inngest-cli@latest dev -u [http://127.0.0.1:8000/api/inngest](http://127.0.0.1:8000/api/inngest) --no-discovery
+```
+
+### Step 4: Start the Frontend (Streamlit)
+
+In the final terminal, launch the user interface:
+
+```bash
+uv run streamlit run .\streamlit_app.py
+```
+
+## 💡 How to Use
+
+1. Open the Streamlit app in your browser (usually `http://localhost:8501`).
+2. **Upload a PDF**: The app will send an event to Inngest to parse and embed the document.
+3. **Wait for Processing**: You can check the Inngest dashboard to see the `rag/ingest_pdf` function running.
+4. **Ask a Question**: Type a query into the chat box. The agent will retrieve relevant context from Qdrant and generate an answer.
+
+## 🤝 Contributing
+
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
