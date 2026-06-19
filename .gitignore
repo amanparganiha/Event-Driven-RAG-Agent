@@ -8,3 +8,10 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Secrets / local config
+.env
+.streamlit/secrets.toml
+
+# Local uploads
+uploads/
