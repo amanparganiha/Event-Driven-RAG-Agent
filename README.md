@@ -125,6 +125,17 @@ The agent retrieves precise snippets and generates concise, citation-backed answ
 
 ---
 
+## Deploy on Streamlit Cloud
+
+This repo has **two run modes**:
+
+- **Event-driven (local):** `main.py` (FastAPI + Inngest) + `streamlit_app.py`, with Qdrant in Docker and the Inngest dev server — the full architecture above.
+- **Single-app (deployable):** `app.py` runs the same RAG pipeline synchronously in one process — no Inngest/FastAPI/Docker. This is what deploys to Streamlit Community Cloud, which only runs a single Streamlit app.
+
+Quick deploy: push to GitHub → create an app at [share.streamlit.io](https://share.streamlit.io) with **main file `app.py`**, then add `OPENAI_API_KEY` under Settings → Secrets. By default it uses an embedded in-memory vector store (set `QDRANT_URL` for a persistent Qdrant Cloud cluster). Full instructions: see **[DEPLOY.md](DEPLOY.md)**.
+
+---
+
 ## **📈 System Design & Scalability Considerations**
 
 - **Decoupled Workflows**: Each step (parse, embed, store) is independently retryable.
