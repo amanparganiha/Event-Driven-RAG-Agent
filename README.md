@@ -3,6 +3,12 @@
 > A fully orchestrated, scalable RAG system built for real-world document Q&A — powered by event-driven workflows, semantic search, and an interactive chat interface.
 > 
 
+**🔗 Live Demo:** [event-driven-rag-agent.streamlit.app](https://event-driven-rag-agent.streamlit.app/)
+
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://event-driven-rag-agent.streamlit.app/)
+
+> Bring your own OpenAI API key (paste it in the sidebar) to try it out.
+
 ---
 
 ## **🎯 Why This Project Matters**
@@ -126,6 +132,8 @@ The agent retrieves precise snippets and generates concise, citation-backed answ
 ---
 
 ## Deploy on Streamlit Cloud
+
+> Live instance: **[event-driven-rag-agent.streamlit.app](https://event-driven-rag-agent.streamlit.app/)**
 
 This repo has **two run modes**:
 
